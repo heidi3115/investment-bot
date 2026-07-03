@@ -6,6 +6,16 @@ const groq = new OpenAI({
     baseURL: 'https://api.groq.com/openai/v1',
 });
 
+const corsHeaders = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+}
+
+export async function OPTIONS() {
+    return new Response(null, { status: 204, headers: corsHeaders });
+}
+
 
 export async function POST(req: Request) {
     const { stockName, stockCode, action, price, quantity, date, memo } = await req.json();
@@ -38,7 +48,8 @@ export async function POST(req: Request) {
 
     console.log('completion 전체:', JSON.stringify(completion, null, 2));   // ← 추가
 
-    return Response.json({
-        explanation: completion.choices[0].message.content,
-    });
+    return Response.json(
+        { explanation: completion.choices[0].message.content },
+        { headers: corsHeaders },
+    );
 }
